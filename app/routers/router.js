@@ -2,8 +2,6 @@ module.exports = app => {
     const router = require('express').Router();
     const controller = require('../controllers/lybrarry-controller');
     const bookFile = require('../middlewere/file');
-    const multer = require('multer');
-    const upload = multer();
 
     router.post('/user/login', (req, res) => {
         res.json('Сервис времено не доступен');
