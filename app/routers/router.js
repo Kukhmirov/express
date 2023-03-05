@@ -15,7 +15,6 @@ module.exports = app => {
         bookFile.single('fileBook'),
         controller.updateBook
     );
-    router.get('/upload/:id', controller.uploadBook);
     router.post('/delete/:id', controller.deleteBook);
 
     app.use('/', router);

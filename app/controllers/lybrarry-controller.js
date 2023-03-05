@@ -35,9 +35,9 @@ exports.create = (req, res) => {
 exports.createNewPost = (req, res) => {
     const {book} = lybrary;
     const {title, description, authors, favorite, fileCover} = req.body;
-    const originalname = req.file.originalname || null;
-    const fileBook = req.file.path || null;
-    const fileName = req.file.filename || null;
+    const originalname = req?.file?.originalname || null;
+    const fileBook = req?.file?.path || null;
+    const fileName = req?.file?.filename || null;
     
     const newBook = new Books(title, description, authors, favorite, fileCover, fileName, originalname, fileBook);
     book.push(newBook);
@@ -93,11 +93,11 @@ exports.uploadBook = (req, res) => {
     const {book} = lybrary;
     const {id} = req.params;
     const index = book.findIndex(elem => elem.id === id);
-    if(index !== -1) {
-        const file = book[index].fileBook;
+    if(index !== -1 && book[index].fileBook) {
+        const file = book[index]?.fileBook;
         res.download(file);
     } else {
-        res.status(404);
+        res.redirect('/404');
     }
 };
 exports.deleteBook = (req, res) => {
@@ -109,6 +109,6 @@ exports.deleteBook = (req, res) => {
         book.splice(index, 1);
         res.redirect('/');
     } else {
-        res.status(404);
+        res.redirect('/404');
     }
 };
