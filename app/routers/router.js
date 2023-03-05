@@ -3,25 +3,20 @@ module.exports = app => {
     const controller = require('../controllers/lybrarry-controller');
     const bookFile = require('../middlewere/file');
 
-    router.post('/user/login', (req, res) => {
-        res.json('Сервис времено не доступен');
-    });
-
-    router.post('/upload-book/',
-        bookFile.single('book-txt'),
-        controller.createBook
+    router.get('/', controller.firstPage);
+    router.get('/create', controller.create);
+    router.post('/create',
+        bookFile.single('fileBook'),
+        controller.createNewPost
     );
+    router.get('/:id', controller.findBook);
+    router.get('/update/:id', controller.update);
+    router.post('/update/:id',
+        bookFile.single('fileBook'),
+        controller.updateBook
+    );
+    router.get('/upload/:id', controller.uploadBook);
+    router.post('/delete/:id', controller.deleteBook);
 
-    router.get('/books', controller.findAll);
-
-    router.get('/books/:id', controller.findOne);
-
-    router.get('/books/:id/download', controller.download)
-
-    router.put('/books/:id', controller.update);
-
-    router.delete('/books/:id', controller.delete);
-
-    
-    app.use('/api', router);
+    app.use('/', router);
 };

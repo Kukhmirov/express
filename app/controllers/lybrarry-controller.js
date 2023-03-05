@@ -1,8 +1,8 @@
-const lybrary = require('../model/library-book');
+const express = require('express');
 const {v4: uuid} = require('uuid');
 
 class Books {
-    constructor(title, description, authors, favorite, fileCover, fileName, fileBook, id = uuid()) {
+    constructor(title, description, authors, favorite, fileCover, fileName, originalname, fileBook, id = uuid()) {
         this.id = id,
         this.title = title,
         this.description = description,
@@ -10,91 +10,105 @@ class Books {
         this.favorite = favorite,
         this.fileCover = fileCover,
         this.fileName = fileName,
+        this.originalname = originalname,
         this.fileBook = fileBook
-    }
+    };
 };
 
-exports.createBook = (req, res) => {
-    if(req.file) {
-        const {path} = req.file;
-        const {book} = lybrary;
-        const {title, description, authors, favorite, fileCover, fileName} = JSON.parse(req.body.data);
-        const newBooks = new Books(title, description, authors, favorite, fileCover, fileName, path);
-        book.push(newBooks);
-        res.json(newBooks);
-        res.status(201);
-    } else {
-        res.send('Ошибка при загрузке файла');
-    }
+const lybrary = {
+    book: [],
 };
 
-exports.download = (req, res) => {
+exports.firstPage = (req, res) => {
+    const {book} = lybrary;
+    res.render('book/index', {
+        title: 'Книжный',
+        books: book,
+    })
+};
+exports.create = (req, res) => {
+    res.render('book/create', {
+        title: 'Добавить новую книгу',
+        book: {},
+    })
+};
+exports.createNewPost = (req, res) => {
+    const {book} = lybrary;
+    const {title, description, authors, favorite, fileCover} = req.body;
+    const originalname = req.file.originalname || null;
+    const fileBook = req.file.path || null;
+    const fileName = req.file.filename || null;
+    
+    const newBook = new Books(title, description, authors, favorite, fileCover, fileName, originalname, fileBook);
+    book.push(newBook);
+    res.redirect('/');
+};
+exports.findBook = (req, res) => {
     const {book} = lybrary;
     const {id} = req.params;
     const index = book.findIndex(elem => elem.id === id);
 
-    if(index !== -1) {
-        const file = book[index].fileBook;
-        res.download(file);
-    } else {
-        res.status(404);
-        res.json('Запись не найдена');
+    if(index === -1) {
+        res.redirect('/404');
     }
-
+    res.render('book/view', {
+        title: 'book | view',
+        book: book[index]
+    })
 };
-
-exports.findAll = (req, res) => {
-    const {book} = lybrary;
-    res.json(book);
-};
-
-exports.findOne = (req, res) => {
-    const {book} = lybrary;
-    const {id} = req.params;
-    const index = book.findIndex(elem => elem.id === id);
-
-    if(index !== -1) {
-        res.json(book[index])
-    } else {
-        res.status(404);
-        res.json('ЗАпись не найдена');
-    }
-};
-
 exports.update = (req, res) => {
+    const {book} = lybrary;
+    const {id} = req.params;
+    const index = book.findIndex(elem => elem.id === id);
+
+    if(index === -1) {
+        res.redirect('/404');
+    } else {
+        res.render('book/update', {
+            title: 'Изменить',
+            book: book[index]
+        })
+    }
+};
+exports.updateBook = (req, res) => {
     const {book} = lybrary;
     const {title, description, authors, favorite, fileCover, fileName} = req.body;
     const {id} = req.params;
 
     const index = book.findIndex(elem => elem.id === id);
+    if(index === -1) {
+        res.redirect('/404');
+    }
+    book[index] = {
+        ...book[index],
+        title,
+        description,
+        authors,
+        favorite,
+        fileCover,
+        fileName,
+    };
+};
+exports.uploadBook = (req, res) => {
+    const {book} = lybrary;
+    const {id} = req.params;
+    const index = book.findIndex(elem => elem.id === id);
     if(index !== -1) {
-        book[index] = {
-            ...book[index],
-            title,
-            description,
-            authors,
-            favorite,
-            fileCover,
-            fileName,
-        };
-        res.json(book[index]);
+        const file = book[index].fileBook;
+        res.download(file);
     } else {
         res.status(404);
-        res.json('Запись не найдена');
     }
 };
-
-exports.delete = (req, res) => {
+exports.deleteBook = (req, res) => {
     const {book} = lybrary;
     const {id} = req.params;
     const index = book.findIndex(elem => elem.id === id);
 
     if(index !== -1) {
         book.splice(index, 1);
-        res.status(201);
-        res.json(book);
+        res.redirect('/');
     } else {
         res.status(404);
-        res.json('Запись не найдена');
     }
 };
