@@ -1,9 +1,18 @@
 const express = require('express');
 const app = express();
+const path = require('path');
+const redis = require('redis');
+
 const logger = require('./app/middlewere/logger');
 const err404 = require('./app/middlewere/err-404');
-const path = require('path');
 
+const REDIS_URL = process.env.REDIS_URL || 'localhost';
+
+const client = redis.createClient({ url: REDIS_URL });
+
+(async () => {
+    await client.connect();
+})();
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
