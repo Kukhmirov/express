@@ -8,8 +8,8 @@ services:
     volumes:
       - ./:/app
     environment:
-     - PORT=3002
-     - REDIS_URL=redis://storage
+      - PORT=3002
+      - REDIS_URL=redis://storage
     ports:
       - 80:3002
     working_dir: /app

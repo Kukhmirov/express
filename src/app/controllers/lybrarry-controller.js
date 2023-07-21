@@ -1,6 +1,13 @@
-const express = require('express');
 const {v4: uuid} = require('uuid');
+const redis = require('redis');
 
+
+const REDIS_URL = process.env.REDIS_URL || 'localhost';
+const client = redis.createClient({ url: REDIS_URL });
+
+(async () => {
+    await client.connect();
+})();
 class Books {
     constructor(title, description, authors, favorite, fileCover, fileName, originalname, fileBook, id = uuid()) {
         this.id = id,
@@ -46,17 +53,20 @@ exports.createNewBook = (req, res) => {
     res.redirect('/');
 };
 
-exports.infoBook = (req, res) => {
+exports.infoBook = async(req, res) => {
     const { book } = lybraryStore;
     const { id } = req.params;
     const index = book.findIndex(elem => elem.id === id);
-
+    
     if(index === -1) {
         res.redirect('/404');
     } else {
+        const countUloadBook = await client.get(id) || 0;
+        
         res.render('book/view', {
             title: 'book | view',
-            book: book[ index ]
+            book: book[ index ],
+            countUloadBook: countUloadBook,
         })
     }
 };
@@ -101,10 +111,13 @@ exports.uploadBook = (req, res) => {
     const {book} = lybraryStore;
     const {id} = req.params;
     const index = book.findIndex(elem => elem.id === id);
-    console.log(book[index].fileBook);
+
     if(index !== -1 && book[index].fileBook) {
         const file = book[index]?.fileBook;
-        res.download(file);
+        
+        res.download(file, () => {
+            client.incr(id);
+        });
     } else {
         res.redirect('/404');
     }

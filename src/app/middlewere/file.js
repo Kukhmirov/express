@@ -2,7 +2,7 @@ const multer = require('multer');
 
 const storage = multer.diskStorage({
     destination(req, res, callback){
-        callback(null, 'app/assets/books');
+        callback(null, 'src/app/assets/books');
     },
     filename(req, file, callback){
         callback(null, `${Date.now()}-${file.originalname}`);
