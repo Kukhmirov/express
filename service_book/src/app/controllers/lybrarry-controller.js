@@ -1,13 +1,7 @@
 const {v4: uuid} = require('uuid');
-const redis = require('redis');
+const { incrPost, incrGet } = require("../routers/counter");
 
 
-const REDIS_URL = process.env.REDIS_URL || 'localhost';
-const client = redis.createClient({ url: REDIS_URL });
-
-(async () => {
-    await client.connect();
-})();
 class Books {
     constructor(title, description, authors, favorite, fileCover, fileName, originalname, fileBook, id = uuid()) {
         this.id = id,
@@ -61,12 +55,14 @@ exports.infoBook = async(req, res) => {
     if(index === -1) {
         res.redirect('/404');
     } else {
-        const countUloadBook = await client.get(id) || 0;
+        // const countUloadBook = await incrGet(id) || 0;
+        // console.log(countUloadBook);
+        // const countUloadBook = 0;
         
         res.render('book/view', {
             title: 'book | view',
             book: book[ index ],
-            countUloadBook: countUloadBook,
+            countUloadBook: 0,
         })
     }
 };
@@ -116,7 +112,7 @@ exports.uploadBook = (req, res) => {
         const file = book[index]?.fileBook;
         
         res.download(file, () => {
-            client.incr(id);
+            incrPost(id);
         });
     } else {
         res.redirect('/404');

@@ -1,18 +1,29 @@
 services:
-  storage:
-   image: redis
-   volumes:
-    - ./data:/data
   counter:
     image: node:alpine
-    volumes:
-      - ./:/app
     environment:
-      - PORT=3002
+      - PORT=4000
       - REDIS_URL=redis://storage
     ports:
-      - 80:3002
-    working_dir: /app
+      - 4000:4000
+    working_dir: /app2
+    volumes:
+      - ./service_counter/:/app2
     command: npm run start
     depends_on:
       - storage
+    links: ["server"]
+  storage:
+    image: redis
+    volumes:
+      - ./data:/data
+  server:
+    image: node:alpine
+    environment:
+      - PORT=3000
+    ports:
+      - 80:3000
+    working_dir: /app1
+    volumes:
+      - ./service_book/:/app1
+    command: npm run start
