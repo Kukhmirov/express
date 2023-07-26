@@ -55,14 +55,13 @@ exports.infoBook = async(req, res) => {
     if(index === -1) {
         res.redirect('/404');
     } else {
-        // const countUloadBook = await incrGet(id) || 0;
-        // console.log(countUloadBook);
-        // const countUloadBook = 0;
+        const countUloadBook = await incrGet(id) || 0;
+        console.log(countUloadBook);
         
         res.render('book/view', {
             title: 'book | view',
             book: book[ index ],
-            countUloadBook: 0,
+            countUloadBook: countUloadBook,
         })
     }
 };

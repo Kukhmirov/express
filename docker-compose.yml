@@ -12,11 +12,12 @@ services:
     command: npm run start
     depends_on:
       - storage
-    links: ["server"]
+
   storage:
     image: redis
     volumes:
       - ./data:/data
+
   server:
     image: node:alpine
     environment:
@@ -26,4 +27,6 @@ services:
     working_dir: /app1
     volumes:
       - ./service_book/:/app1
+    depends_on:
+      - storage
     command: npm run start

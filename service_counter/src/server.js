@@ -1,8 +1,9 @@
 const express = require("express");
 const app = express();
-const redis = require("redis");
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost';
+const redis = require("redis");
+const REDIS_URL = process.env.REDIS_URL || 'redis://storage';
+
 const client = redis.createClient({ url: REDIS_URL });
 
 (async () => {
@@ -11,6 +12,7 @@ const client = redis.createClient({ url: REDIS_URL });
 
 app.get("/counter/:bookID", async( req, res ) => {
     const { bookID } = req.params;
+    console.log(bookID);
 
     try {
       const cnt = await client.get( bookID );
@@ -33,7 +35,7 @@ app.post("/counter/:bookID/incr", async( req, res ) => {
 })
 
 
-const PORT = process.env.PORT || 4002;
+const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
     console.log(`Сервер запущен на ${ PORT } порту`);
