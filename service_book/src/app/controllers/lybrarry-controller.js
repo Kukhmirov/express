@@ -1,5 +1,6 @@
-const express = require('express');
 const {v4: uuid} = require('uuid');
+const { incrPost, incrGet } = require("../routers/counter");
+
 
 class Books {
     constructor(title, description, authors, favorite, fileCover, fileName, originalname, fileBook, id = uuid()) {
@@ -46,17 +47,20 @@ exports.createNewBook = (req, res) => {
     res.redirect('/');
 };
 
-exports.infoBook = (req, res) => {
+exports.infoBook = async(req, res) => {
     const { book } = lybraryStore;
     const { id } = req.params;
     const index = book.findIndex(elem => elem.id === id);
-
+    
     if(index === -1) {
         res.redirect('/404');
     } else {
+        const countUloadBook = await incrGet(id) || 0;
+        
         res.render('book/view', {
             title: 'book | view',
-            book: book[ index ]
+            book: book[ index ],
+            countUloadBook: countUloadBook,
         })
     }
 };
@@ -101,10 +105,13 @@ exports.uploadBook = (req, res) => {
     const {book} = lybraryStore;
     const {id} = req.params;
     const index = book.findIndex(elem => elem.id === id);
-    console.log(book[index].fileBook);
+
     if(index !== -1 && book[index].fileBook) {
         const file = book[index]?.fileBook;
-        res.download(file);
+        
+        res.download(file, () => {
+            incrPost(id);
+        });
     } else {
         res.redirect('/404');
     }
