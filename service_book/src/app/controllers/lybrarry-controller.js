@@ -56,7 +56,6 @@ exports.infoBook = async(req, res) => {
         res.redirect('/404');
     } else {
         const countUloadBook = await incrGet(id) || 0;
-        console.log(countUloadBook);
         
         res.render('book/view', {
             title: 'book | view',

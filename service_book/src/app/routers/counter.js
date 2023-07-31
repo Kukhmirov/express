@@ -1,9 +1,13 @@
+require('dotenv').config();
+const counterUrl = process.env.MICROSERVICE_COUNTER_URL;
+
 const incrPost = idBook => {
-    fetch(`http://counter:4000/counter/${idBook}/incr`, {method: 'post'});
+    fetch(`${counterUrl}/counter/${idBook}/incr`, {method: 'post'});
+    
 };
 
 const incrGet = idBook => {
-    const url = `http://counter:4000/counter/${idBook}`;
+    const url = `${counterUrl}/counter/${idBook}`;
 
     return fetch(url, {method: 'get'})
         .then(response => response.json())
