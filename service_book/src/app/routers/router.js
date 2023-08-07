@@ -12,7 +12,7 @@ module.exports = app => {
         controller.createNewBook
     );
 
-    router.get('/:id', controller.infoBook);
+    router.get('/book/:id', controller.infoBook);
 
     router.get('/update/:id', controller.update);
 

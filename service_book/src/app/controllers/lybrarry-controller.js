@@ -1,30 +1,13 @@
 const {v4: uuid} = require('uuid');
 const { incrPost, incrGet } = require("../routers/counter");
+const BooksDb = require("../models/booksDb");
 
 
-class Books {
-    constructor(title, description, authors, favorite, fileCover, fileName, originalname, fileBook, id = uuid()) {
-        this.id = id,
-        this.title = title,
-        this.description = description,
-        this.authors = authors,
-        this.favorite = favorite,
-        this.fileCover = fileCover,
-        this.fileName = fileName,
-        this.originalname = originalname,
-        this.fileBook = fileBook
-    };
-};
-
-const lybraryStore = {
-    book: [],
-};
-
-exports.firstPage = (req, res) => {
-    const { book } = lybraryStore;
+exports.firstPage = async(req, res) => {
+    const books = await BooksDb.find().select("-__v");
     res.render('book/index', {
         title: 'Книжный',
-        books: book,
+        books: books,
     })
 };
 
@@ -35,97 +18,100 @@ exports.create = (req, res) => {
     })
 };
 
-exports.createNewBook = (req, res) => {
-    const { book } = lybraryStore;
+exports.createNewBook = async(req, res) => {
     const { title, description, authors, favorite, fileCover } = req.body;
     const originalname = req?.file?.originalname || null;
     const fileBook = req?.file?.path || null;
     const fileName = req?.file?.filename || null;
     
-    const newBook = new Books( title, description, authors, favorite, fileCover, fileName, originalname, fileBook );
-    book.push(newBook);
-    res.redirect('/');
+    const newBookDb = new BooksDb({ title, description, authors, favorite, fileCover, fileName, originalname, fileBook });
+    try {
+        await newBookDb.save();
+        res.redirect('/');
+    } catch(err) {
+        console.log(err);
+        res.redirect('/404');
+    }
 };
 
 exports.infoBook = async(req, res) => {
-    const { book } = lybraryStore;
     const { id } = req.params;
-    const index = book.findIndex(elem => elem.id === id);
+    const book = await BooksDb.findById(id).select("-__v");
     
-    if(index === -1) {
+    if(!book) {
         res.redirect('/404');
     } else {
         const countUloadBook = await incrGet(id) || 0;
         
         res.render('book/view', {
             title: 'book | view',
-            book: book[ index ],
+            book: book,
             countUloadBook: countUloadBook,
         })
     }
 };
 
-exports.update = (req, res) => {
-    const { book } = lybraryStore;
+exports.update = async(req, res) => {
     const { id } = req.params;
-    const index = book.findIndex(elem => elem.id === id);
+    const book = await BooksDb.findById(id).select("-__v");
 
-    if(index === -1) {
+    if(!book) {
         res.redirect('/404');
     } else {
         res.render('book/update', {
             title: 'Изменить',
-            book: book[ index ]
+            book: book
         })
     }
 };
 
-exports.updateBook = (req, res) => {
-    const {book} = lybraryStore;
+exports.updateBook = async(req, res) => {
     const {title, description, authors, favorite, fileCover, fileName} = req.body;
     const {id} = req.params;
 
-    const index = book.findIndex(elem => elem.id === id);
-    if(index === -1) {
-        res.redirect('/404');
-    }
-    book[index] = {
-        ...book[index],
-        title,
-        description,
-        authors,
-        favorite,
-        fileCover,
-        fileName,
-    };
-    res.redirect('/');
-};
-
-exports.uploadBook = (req, res) => {
-    const {book} = lybraryStore;
-    const {id} = req.params;
-    const index = book.findIndex(elem => elem.id === id);
-
-    if(index !== -1 && book[index].fileBook) {
-        const file = book[index]?.fileBook;
-        
-        res.download(file, () => {
-            incrPost(id);
+    try {
+        await BooksDb.findByIdAndUpdate(id, {
+            title,
+            description,
+            authors,
+            favorite,
+            fileCover,
+            fileName,
         });
-    } else {
+        res.redirect('/');
+    } catch(env) {
         res.redirect('/404');
+    };
+};
+
+exports.uploadBook = async(req, res) => {
+    const {id} = req.params;
+    const book = await BooksDb.findById(id).select("-v");
+  
+    if (!book) {
+        res.redirect('/404');
+    } else {
+        const fileName = book.originalname;
+        const fileType = book.fileBook.sub_type;
+  
+        if (fileType) {
+            res.setHeader('Content-Type', fileType);
+        }
+  
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        res.send(book.fileBook.buffer);
     }
 };
 
-exports.deleteBook = (req, res) => {
-    const {book} = lybraryStore;
+exports.deleteBook = async(req, res) => {
     const {id} = req.params;
-    const index = book.findIndex(elem => elem.id === id);
 
-    if(index !== -1) {
-        book.splice(index, 1);
+    try {
+        await BooksDb.deleteOne({
+            _id: id,
+        });
         res.redirect('/');
-    } else {
+    } catch(env) {
         res.redirect('/404');
     }
 };
