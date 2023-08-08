@@ -12,7 +12,6 @@ const client = redis.createClient({ url: REDIS_URL });
 
 app.get("/counter/:bookID", async( req, res ) => {
     const { bookID } = req.params;
-    console.log(bookID);
 
     try {
       const cnt = await client.get( bookID );

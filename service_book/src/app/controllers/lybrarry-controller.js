@@ -100,6 +100,7 @@ exports.uploadBook = async(req, res) => {
   
         res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
         res.send(book.fileBook.buffer);
+        incrPost(id);
     }
 };
 
