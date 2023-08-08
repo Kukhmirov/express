@@ -5,25 +5,25 @@ module.exports = app => {
 
     router.get('/', controller.firstPage);
 
-    router.get('/create', controller.create);
+    router.get('/api/create', controller.create);
 
-    router.post('/create',
+    router.post('/api/create',
         bookFile.single('fileBook'),
         controller.createNewBook
     );
 
-    router.get('/book/:id', controller.infoBook);
+    router.get('/api/book/:id', controller.infoBook);
 
-    router.get('/update/:id', controller.update);
+    router.get('/api/update/:id', controller.update);
 
-    router.post('/update/:id',
+    router.post('/api/update/:id',
         bookFile.single('fileBook'),
         controller.updateBook
     );
 
-    router.get('/upload/:id', controller.uploadBook);
+    router.get('/api/upload/:id', controller.uploadBook);
     
-    router.post('/delete/:id', controller.deleteBook);
+    router.post('/api/delete/:id', controller.deleteBook);
 
     app.use('/', router);
 };
