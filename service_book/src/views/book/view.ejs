@@ -32,6 +32,32 @@
                     </form>
                 </div>
 
+                <div class="row d-flex">
+                    <div class="col-md-8 col-lg-6 col-xl-4">
+              
+                        <div class="card" id="chat1" style="border-radius: 15px;">
+                            <div
+                                class="card-header d-flex justify-content-between align-items-center p-3 bg-info text-white border-bottom-0"
+                                style="border-top-left-radius: 15px; border-top-right-radius: 15px;"
+                            >
+                                <i class="fas fa-angle-left"></i>
+                                <p class="mb-0 fw-bold">Live chat</p>
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <div class="card-body" id="boxList"></div>
+                            <div class="form-outline">
+                                <label for="inputText">Сообщение</label>
+                                <textarea
+                                    class="form-control"
+                                    id="inputText"
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            
+                            <button id="sendMsg" type="submit">Отправить</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
