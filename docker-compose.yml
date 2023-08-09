@@ -22,6 +22,7 @@ services:
     image: node:alpine
     environment:
       - PORT=3000
+      - MONGODB_URL=mongodb://root:example@mongo:27017/
     ports:
       - 80:3000
     working_dir: /app1
@@ -30,3 +31,20 @@ services:
     depends_on:
       - storage
     command: npm run start
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/

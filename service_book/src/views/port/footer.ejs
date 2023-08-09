@@ -12,5 +12,39 @@
     </div>
 </footer>
 
+<script>
+    const roomName = location.pathname.split('/api/book/').pop();
+    const socket = io.connect('/', {
+        query: `roomName=${roomName}`
+    })
+
+    const boxList = document.querySelector('#boxList');
+    const inputText = document.querySelector("#inputText");
+    const sendMsg = document.querySelector('#sendMsg');
+    
+    const getTmpl = (msg) => {
+        return `
+            <div class="d-flex flex-row justify-content-start mb-4">
+                <div class="p-3 ms-3" style="border-radius: 15px; background-color: rgba(57, 192, 237,.2);">
+                    <p class="small mb-0">
+                        ${msg.text}
+                    </p>
+                </div>
+            </div>
+        `;
+    };
+
+    socket.on("message-to-room", (msg) => {
+        const div = getTmpl(msg);
+        boxList.insertAdjacentHTML("beforeend", div)
+    });
+
+    sendMsg.addEventListener("click", () => {
+        socket.emit("message-to-room", {
+            text: inputText.value,
+        })
+    })
+</script>
+
 </body>
 </html>

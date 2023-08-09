@@ -6,5 +6,6 @@ WORKDIR /app1
 COPY ./package*.json ./
 RUN npm install
 COPY ./src src/
+ENV MONGODB_URL=${MONGODBURL}
 
 CMD [ "npm", "run", "start" ]

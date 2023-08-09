@@ -17,21 +17,47 @@
                 <p class="card-text">Книга - <%= book.fileName %></p>
 
                 <div class="text-right">
-                    <a class="btn btn-sm btn-primary" href="/update/<%= book.id %>">
+                    <a class="btn btn-sm btn-primary" href="/api/update/<%= book.id %>">
                         Редактировать
                     </a>
-                    <form action="/upload/<%= book.id %>" method="GET" class="d-inline">
+                    <form action="/api/upload/<%= book.id %>" method="GET" class="d-inline">
                         <button class="btn btn-sm btn-primary">
                             Скачать
                         </button>
                     </form>
-                    <form action="/delete/<%= book.id %>" method="POST" class="d-inline">
+                    <form action="/api/delete/<%= book.id %>" method="POST" class="d-inline">
                         <button class="btn btn-sm btn-danger">
                             Удалить
                         </button>
                     </form>
                 </div>
 
+                <div class="row d-flex">
+                    <div class="col-md-8 col-lg-6 col-xl-4">
+              
+                        <div class="card" id="chat1" style="border-radius: 15px;">
+                            <div
+                                class="card-header d-flex justify-content-between align-items-center p-3 bg-info text-white border-bottom-0"
+                                style="border-top-left-radius: 15px; border-top-right-radius: 15px;"
+                            >
+                                <i class="fas fa-angle-left"></i>
+                                <p class="mb-0 fw-bold">Live chat</p>
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <div class="card-body" id="boxList"></div>
+                            <div class="form-outline">
+                                <label for="inputText">Сообщение</label>
+                                <textarea
+                                    class="form-control"
+                                    id="inputText"
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                            
+                            <button id="sendMsg" type="submit">Отправить</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
